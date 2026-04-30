@@ -1,41 +1,53 @@
-name: Verify Human Identity
-
-on:
-  workflow_dispatch:
-    inputs:
-      agent_name:
+workflow_dispatch:
+inputs:
+agent_name:
+        description: "Agent Name"
         description: 'Rkyk21'
-        required: true
+required: true
+        default: "Rkyk21"
         default: 'Rkyk21'
-      agent_description:
+agent_description:
+        description: "Agent Description"
         description: 'asc'
-        required: true
+required: true
+        default: "Rkyk21 AI Agent"
         default: 'asclaw AI Agent'
 
 jobs:
-  verify:
-    runs-on: ubuntu-latest
+verify:
+runs-on: ubuntu-latest
 
-    steps:
+steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
       - name: Setup Node.js
         uses: actions/setup-node@v3
-        with:
+with:
+          node-version: "20"
           node-version: '20'
 
+      - name: Install verified-agent-identity
       - name: Step 1 - Install ClawHub skill
-        run: npx clawhub@latest install verified-agent-identity
+run: npx clawhub@latest install verified-agent-identity
 
+      - name: Install dependencies
       - name: Install script dependencies
-        run: |
-          cd scripts
-          npm install
+run: |
+         cd scripts
+         npm install
 
+      - name: Create Ethereum Identity
       - name: Step 2 - Create new Ethereum Identity
-        run: node scripts/createNewEthereumIdentity.js
+run: node scripts/createNewEthereumIdentity.js
 
+      - name: Link Human to Agent
       - name: Step 3 - Link Human to Agent
-        run: |
+run: |
+          node scripts/manualLinkHumanToAgent.js \
+          --challenge '{"name": "Rkyk21", "description": "Rkyk21 AI Agent"}'
           node scripts/manualLinkHumanToAgent.js --challenge '{"name": "Rkyk21", "description": "Rkyk21 AI Agent"}'
